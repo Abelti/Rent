@@ -3,7 +3,8 @@ const app = express();
 
 require('dotenv').config();
 
-const manager = require('./routes/managerRoutes');
+const MANAGER = require('./routes/managerRoutes');
+const property_owner = require('./routes/poRoutes')
 
 const port = process.env.PORT || 4040;
 
@@ -13,8 +14,8 @@ app.get('/test', (req, res) => {
     res.send("Test");
 });
 
-// Add routes for manager endpoints here
-app.use('/api/manager', manager);
+// Add routes for property_owner endpoints here
+app.use('/api/po', property_owner);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`)
