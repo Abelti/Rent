@@ -1,23 +1,58 @@
-function register(req, res, next) {
-    // Your code to register a new user goes here.
-    // This function should take user details as input and send a POST request to the server.
-    // The server should then process the request and add the user to the database.
-    // You should also handle any potential errors that may occur during the registration process.
+const User = require('../models/userModel');
+const Otp = require('../models/otpModel');
+const sendMail = require('../utilities/sendMail');
+const generateOtp = require('../utilities/generateOTP');
+const mongoose = require('mongoose');
 
-    const { first_name, last_name, phone, email, address, password, subscription, payment_method, payment_info, id_picture } = req.body;
-    if (!first_name || !last_name || !phone || !email || !address || !password || !subscription || !payment_method || !payment_info || !id_picture) {
-        res.status(400);
-        res.send("All fields are required.");
+const register = async (req, res, next) => {
+    try {
+        const { first_name, last_name, phone, email, address, password, subscription, payment_method, payment_info, id_picture } = req.body;
+        if (!first_name || !last_name || !phone || !email || !address || !password || !subscription || !payment_method || !payment_info || !id_picture) {
+            return res.status(400).send("All fields are required.");
+        }
+
+        // Generate OTP
+        const otpCode = generateOtp();
+        const otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes from now
+
+        // Save OTP in database
+        const otp = new Otp({ email, otp: otpCode, expiresAt: otpExpiry });
+        await otp.save();
+
+        // Send OTP via email
+        await sendMail({
+            email,
+            subject: 'Verify Your Rent Account',
+            template: 'mail.ejs',
+            data: { first_name, last_name, activationCode: otpCode }
+        });
+
+        res.status(200).send('OTP sent to your email address.');
+    } catch (error) {
+        next(error);
     }
+};
 
-    res.send(first_name + " " + last_name + " ");
-}
+const verifyOtp = async (req, res, next) => {
+    try {
+        const { email, otp } = req.body;
+        const otpRecord = await Otp.findOne({ email, otp });
 
-function login() {
-    // Your code to handle user login goes here.
-    // This function should take user credentials as input and send a POST request to the server.
-    // The server should then process the request and validate the user's credentials.
-    // You should also handle any potential errors that may occur during the login process.
-}
+        if (!otpRecord || otpRecord.expiresAt < Date.now()) {
+            return res.status(400).send('Invalid or expired OTP.');
+        }
 
-module.exports = { register, login };
+        // OTP is valid, delete the OTP record
+        await Otp.deleteOne({ email, otp });
+
+        // Save user to database
+        const user = new User(req.body);
+        await user.save();
+
+        res.status(200).send(`User ${user.first_name} ${user.last_name} registered successfully.`);
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { register, verifyOtp };

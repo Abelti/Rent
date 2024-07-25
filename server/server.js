@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const connectDB = require('./utilities/databaseConnection');
 
 require('dotenv').config();
 
@@ -7,6 +8,8 @@ const MANAGER = require('./routes/managerRoutes');
 const property_owner = require('./routes/poRoutes')
 
 const port = process.env.PORT || 4040;
+
+connectDB();
 
 app.use(express.json());
 
