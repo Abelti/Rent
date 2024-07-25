@@ -19,13 +19,15 @@ const register = async (req, res, next) => {
         const otp = new Otp({ email, otp: otpCode, expiresAt: otpExpiry });
         await otp.save();
 
+        console.log(`OTP Saved to the database`);
         // Send OTP via email
         await sendMail({
-            email,
+            email: email,
             subject: 'Verify Your Rent Account',
-            template: 'mail.ejs',
+            template: 'activation_mail.ejs',
             data: { first_name, last_name, activationCode: otpCode }
         });
+        console.log(`Email Sent to ${email}`);
 
         res.status(200).send('OTP sent to your email address.');
     } catch (error) {
