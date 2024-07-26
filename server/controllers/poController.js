@@ -3,12 +3,19 @@ const Otp = require('../models/otpModel');
 const sendMail = require('../utilities/sendMail');
 const generateOtp = require('../utilities/generateOTP');
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 const register = async (req, res, next) => {
     try {
         const { first_name, last_name, phone, email, address, password, subscription, payment_method, payment_info, id_picture } = req.body;
         if (!first_name || !last_name || !phone || !email || !address || !password || !subscription || !payment_method || !payment_info || !id_picture) {
             return res.status(400).send("All fields are required.");
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).send("User with this email already exists.");
         }
 
         // Generate OTP
@@ -20,12 +27,13 @@ const register = async (req, res, next) => {
         await otp.save();
 
         console.log(`OTP Saved to the database`);
+
         // Send OTP via email
         await sendMail({
             email: email,
-            subject: 'Verify Your Rent Account',
-            template: 'activation_mail.ejs',
-            data: { first_name, last_name, activationCode: otpCode }
+            subject: 'Your OTP Code',
+            template: 'activation_mail.ejs', // Adjust the template name as needed
+            data: { first_name, last_name, otp: otpCode }
         });
         console.log(`Email Sent to ${email}`);
 

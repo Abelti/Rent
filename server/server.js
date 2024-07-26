@@ -1,8 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const connectDB = require('./utilities/databaseConnection');
-
-require('dotenv').config();
 
 const MANAGER = require('./routes/managerRoutes');
 const property_owner = require('./routes/poRoutes')
