@@ -4,10 +4,13 @@ const sendMail = require('../utilities/sendMail');
 const generateOtp = require('../utilities/generateOTP');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const path = require('path');
 
 const register = async (req, res, next) => {
     try {
-        const { first_name, last_name, phone, email, address, password, subscription, payment_method, payment_info, id_picture } = req.body;
+        const { first_name, last_name, phone, email, address, password, subscription, payment_method, payment_info } = req.body;
+        const id_picture = req.file.path;
+
         if (!first_name || !last_name || !phone || !email || !address || !password || !subscription || !payment_method || !payment_info || !id_picture) {
             return res.status(400).send("All fields are required.");
         }
@@ -51,7 +54,7 @@ const verifyOtp = async (req, res, next) => {
         if (!otpRecord || otpRecord.expiresAt < Date.now()) {
             return res.status(400).send('Invalid or expired OTP.');
         }
-
+        console.log(`OTP is correct`)
         // OTP is valid, delete the OTP record
         await Otp.deleteOne({ email, otp });
 
