@@ -2,16 +2,17 @@ const User = require('../models/userModel');
 const Otp = require('../models/otpModel');
 const sendMail = require('../utilities/sendMail');
 const generateOtp = require('../utilities/generateOTP');
-const mongoose = require('mongoose');
 require('dotenv').config();
 const path = require('path');
 
 const register = async (req, res, next) => {
     try {
         const { first_name, last_name, phone, email, address, password, subscription, payment_method, payment_info } = req.body;
-        const id_picture = req.file.path;
+        const id_picture = req.file?.path;
+        console.log(req.body);
+        console.log(id_picture);
 
-        if (!first_name || !last_name || !phone || !email || !address || !password || !subscription || !payment_method || !payment_info || !id_picture) {
+        if (!first_name || !last_name || !phone || !email || !address || !password || !subscription || !payment_method || !payment_info || id_picture) {
             return res.status(400).send("All fields are required.");
         }
 

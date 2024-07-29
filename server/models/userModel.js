@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema({
     },
     id_picture: {
         type: String,
-        required: true
+        required: false
     }
 }, { timestamps: true });
 
