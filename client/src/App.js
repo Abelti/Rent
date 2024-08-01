@@ -1,16 +1,23 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import HomePage from './pages/HomePage';
+import SignInPage from './pages/SignInPage';
+import SignUpPage from './pages/SignUpPage';
+
 function App() {
-  const handleClick = () => {
-    console.log('Button clicked');
-    // Perform your desired action here
-
-  }
-
   return (
-    <div>
-      <h1>Welcome to My Application</h1>
-      <button onClick={() => handleClick()}>Click Me</button>
-    </div>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/signin" element={<SignInPage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
