@@ -6,7 +6,7 @@ function HeaderComponent() {
     return (
         <header className="header">
             <div className="logo">
-                <Link to="/">Logo</Link>
+                <Link to="/">im</Link>
             </div>
             <nav className="nav">
                 <ul className="nav-links">
